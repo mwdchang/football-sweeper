@@ -29,7 +29,7 @@
             <label class="label">Mines</label>
           </div>
           <div class="status-item">
-            <span class="value" id="timer">00:00</span>
+            <span class="value" id="timer" style="width: 4rem; text-align: right">00:00</span>
             <label class="label">Time</label>
           </div>
           <button class="btn-action" id="btn-reset">
@@ -47,8 +47,27 @@
         <canvas id="renderCanvas"></canvas>
       </main>
       <div id="overlay"></div>
+
+      <div id="instruction-button">
+        Instructions
+      </div>
       <div id="instruction">
-        Left-click to reveal, right-click (long press) to flag.
+        <h3>Football Sweeper</h3>
+        <div style="margin-bottom: 1rem"> 
+          Football Sweeper is a minesweeper game that takes place on the surface of a classical football. 
+        </div>
+        <div style="margin-bottom: 1rem"> 
+          <ul class="modern-list">
+            <li>The <b>hexagon</b> patches can contain mines, clear them to win the game. </li>
+            <li>The <b>pentagon</b> patches are neutral patches, they do not contain maines.</li>
+          </ul>
+        </div>
+        <div style="margin-bottom: 1rem"> 
+          Use left-click to reveal a patch, use right-click (or long press) to flag a patch.
+        </div>
+        <div style="margin-bottom: 1rem"> 
+          Use drag motion to move and zoom the camera.
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>

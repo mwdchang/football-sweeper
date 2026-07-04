@@ -5,7 +5,7 @@ import {
   ArcRotateCamera,
   Vector3,
   HemisphericLight,
-  // PointLight,
+  PointLight,
   MeshBuilder,
   StandardMaterial,
   Color3,
@@ -35,6 +35,9 @@ let downX: number, downY: number = 0;
 let observer: Observer<any>;
 let longPress: number = 0;
 
+// Creates the lines between panels
+const GAP_FACTOR = 0.96; 
+
 class SphericalSweeper {
   private canvas: HTMLCanvasElement;
   private engine: Engine;
@@ -60,6 +63,9 @@ class SphericalSweeper {
   private timerEl!: HTMLElement;
   private resetBtn!: HTMLElement;
   private overlayEl!: HTMLElement;
+
+  private instructionBtnEL!: HTMLElement;
+  private instructionEL!: HTMLElement;
 
   // Materials Cache
   private pentagonMat!: StandardMaterial;
@@ -96,6 +102,8 @@ class SphericalSweeper {
     this.timerEl = document.getElementById('timer')!;
     this.resetBtn = document.getElementById('btn-reset')!;
     this.overlayEl = document.getElementById('overlay')!;
+    this.instructionBtnEL = document.getElementById('instruction-button')!;
+    this.instructionEL = document.getElementById('instruction')!;
 
     this.sizeSelect.addEventListener('change', () => {
       this.hexagonCount = parseInt(this.sizeSelect.value);
@@ -108,11 +116,20 @@ class SphericalSweeper {
     });
 
     this.resetBtn.addEventListener('click', () => this.initGame());
+
+    this.instructionBtnEL.addEventListener('click', () => {
+      this.instructionEL.style.display = 'block';
+      this.instructionBtnEL.style.display = 'none';
+    });
+
+    this.instructionEL.addEventListener('click', () => {
+      this.instructionEL.style.display = 'none';
+      this.instructionBtnEL.style.display = 'block';
+    });
   }
 
   private initScene() {
-    // Elegant dark space background
-    this.scene.clearColor = new Color3(0.04, 0.05, 0.08).toColor4(1.0);
+    this.scene.clearColor = new Color3(0.10, 0.15, 0.10).toColor4(1.0);
 
     // Dynamic rotation camera
     this.camera = new ArcRotateCamera(
@@ -139,6 +156,15 @@ class SphericalSweeper {
     ambientLight.diffuse = new Color3(0, 0, 0);
     ambientLight.specular = new Color3(0, 0, 0);
     ambientLight.groundColor = new Color3(0, 0, 0);
+
+    // Point-light
+    const light = new PointLight(
+      'pointLight',
+      new Vector3(8, 8, 8),
+      this.scene
+    );
+    light.intensity = 0.1;
+    light.diffuse = new Color3(1, 1, 0);
 
     // Soccer ball root mesh
     this.ballContainer = MeshBuilder.CreateSphere('ballContainer', { diameter: 0.1 }, this.scene);
@@ -194,8 +220,8 @@ class SphericalSweeper {
   private initMaterials() {
     // Pentagons
     this.pentagonMat = new StandardMaterial('pentagonMat', this.scene);
-    this.pentagonMat.diffuseColor = Color3.FromHexString('#555555');
-    this.pentagonMat.ambientColor = Color3.FromHexString('#555555');
+    this.pentagonMat.diffuseColor = Color3.FromHexString('#333333');
+    this.pentagonMat.ambientColor = Color3.FromHexString('#333333');
     this.pentagonMat.specularColor = new Color3(0, 0, 0);
     this.pentagonMat.emissiveColor = new Color3(0, 0, 0);
     this.pentagonMat.roughness = 1.0;
@@ -392,7 +418,7 @@ class SphericalSweeper {
 
       // Cell geometry scaling parameters for beveling
       const radius = 2.0; // Ball radius scale
-      const gapFactor = 0.93; // Creates the lines between panels
+      const gapFactor = GAP_FACTOR;
       const height = 0.08; // Bevel depth
 
       const center = cell.center.scale(radius * 1.02);
@@ -555,10 +581,14 @@ class SphericalSweeper {
     }
 
     this.endInterval = setTimeout(() => {
-      this.overlayEl!.textContent = win
-        ? 'Winner! You swept the ball safely!'
-        : 'Red Card! You hit a soccer mine.'
-        
+      if (win === true) {
+        this.overlayEl!.classList.remove('lost');
+        this.overlayEl!.textContent = 'Winner! You swept the ball safely!';
+      } else {
+        this.overlayEl!.textContent = 'Red Card! You hit a soccer mine.';
+        this.overlayEl!.classList.add('lost');
+      }
+
       this.overlayEl!.style.display = 'block';
     }, 200);
   }
